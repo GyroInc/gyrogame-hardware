@@ -10,7 +10,7 @@ String command = ""; // Stores response from HC-06
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);       //monitor
-  Serial1.begin(115200);      //bluetooth
+  Serial1.begin(57600);      //bluetooth
 
   Serial.print("AT      "); 
   Serial1.print("AT");                  //PING
@@ -49,8 +49,8 @@ void setup() {
   Serial.println(command);
   command = ""; // No repeats
 
-  Serial.print("AT+BAUD8     "); 
-  Serial1.print("AT+BAUD8");               //CHANGE SPEED TO 115K
+  Serial.print("AT+BAUD7     "); 
+  Serial1.print("AT+BAUD7");               //CHANGE SPEED TO 115K
   if (Serial1.available()) {
     while(Serial1.available()) { // While there is more to be read, keep reading.
       command += (char)Serial1.read();   
