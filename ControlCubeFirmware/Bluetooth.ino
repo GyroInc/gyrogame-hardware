@@ -13,13 +13,23 @@ void ReceiveData()
         Serial.print(data);
       #endif
     }
-    #if DEBUG
-        Serial.println();
-    #endif
   }
 }
 
 void SendData()
 {
 
+String data;
+
+if (Serial.available() > 0)
+{
+  while (Serial.available() > 0)
+    {
+      data = Serial.readString(); 
+
+      #if DEBUG
+        BT.print(data);
+      #endif
+    }
+  }
 }
