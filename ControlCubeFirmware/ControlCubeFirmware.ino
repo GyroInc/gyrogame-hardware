@@ -65,5 +65,6 @@ void loop() {
   GyroUpdate();
 
   ReceiveData();
-  SendData();
+
+  FastLED.show();
 }
