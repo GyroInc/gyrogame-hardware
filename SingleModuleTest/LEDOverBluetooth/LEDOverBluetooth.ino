@@ -26,7 +26,7 @@ void setup()
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness(  BRIGHTNESS );
 
-  BT.begin(9600);
+  BT.begin(57600);
   BT.println("Bluetooth On please press 1 or 0 blink LED ..");
   pinMode(ledpin, OUTPUT);
 }
