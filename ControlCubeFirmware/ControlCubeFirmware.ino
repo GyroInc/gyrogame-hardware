@@ -2,15 +2,18 @@
 #include <FastLED.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include <SoftwareSerial.h>
+#include <NeoSWSerial.h>
 
 //presets
 #define LED_PIN     9
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define BAUDBT 57600
-#define BAUDSE 57600
+#define DEBUG true
+#define GYRO false
+#define BAUDBT 38400
+#define BAUDSE 38400
+#define DEFAULT_BRIGHTNESS 64
 
 //variables
 float x, y, z;
@@ -29,15 +32,12 @@ bool fi = false, fia = false;
 uint8_t fLed;
 int fTime;
 
-#define DEBUG false
-#define GYRO false
-
 #if DEBUG
 unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-SoftwareSerial BT(5, 6);
+NeoSWSerial BT(5, 6);
 MPU6050 mpu6050(Wire, 0.1, 0.6);
 CRGB leds[6];
 
@@ -49,7 +49,7 @@ void setup() {
 
   //initialize LEDs
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, 6).setCorrection( TypicalLEDStrip );
-  SetLedBrightnes(64);
+  SetLedBrightness(DEFAULT_BRIGHTNESS);
   LedOff();
 #if DEBUG
   Serial.println("---LEDs initialized---");
