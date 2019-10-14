@@ -24,12 +24,15 @@ void ProcessData(char* data)
     Serial.write(data);
   #endif
 
+  
+
   //confirm that its the controller for the game
   //cc stands for confirm cube
   if (data[0] == 'c' && data[1] == 'c')
   {
     //confim that its a valid control cube
     SendData("y");
+    cubeConnected = true;
   }
 
   //set color of a led
@@ -45,11 +48,67 @@ void ProcessData(char* data)
   //format is forced: ar5g50b250
   if (data[0] == 'a')
   {
-    //select led
-    for(int i = 0; i < 6; i++)
+    SetAllLed(atoi(strpbrk(data, "r")+1), atoi(strpbrk(data, "g")+1), atoi(strpbrk(data, "b")+1));  
+  }
+
+  //fade subcategory
+  if (data[0] == 'f')
+  {
+    switch(data[1])
     {
-      SetLedColor(i, atoi(strpbrk(data, "r")+1), atoi(strpbrk(data, "g")+1), atoi(strpbrk(data, "b")+1));
-    }    
+      //fade in
+      case 'i':
+        //fi0r255g255b255t1000
+        fLed = (int)data[2] - 48;
+        leds[fLed].r = atoi(strpbrk(data, "r")+1);
+        leds[fLed].g = atoi(strpbrk(data, "g")+1);
+        leds[fLed].b = atoi(strpbrk(data, "b")+1);
+        fTime = atoi(strpbrk(data, "t")+1);
+        fi = true;
+      break;
+      //fade in all
+      case 'a':
+        //far255g255b255t1000
+        tr = atoi(strpbrk(data, "r")+1);
+        tg = atoi(strpbrk(data, "g")+1);
+        tb = atoi(strpbrk(data, "b")+1);
+        fTime = atoi(strpbrk(data, "t")+1);
+        fia = true;
+      break;
+      //fade out
+      case 'o':
+        //fo0t1000
+        fLed = (int)data[2] - 48;
+        fTime = atoi(strpbrk(data, "t")+1);
+        fo = true;
+      break;
+      //fade out all
+      case 'p':
+        //fbt1000
+        fTime = atoi(strpbrk(data, "t")+1);
+        foa = true;
+      break;
+    }
+  }
+
+  //change brightness
+  if(data[0] == 'b')
+  {
+    //b255
+    SetLedBrightnes(atoi(strpbrk(data, "b")+1));
+  }
+
+  //+DISC:Success
+  //computer disconnected
+  if(data[0] == '+')
+  {
+    if(data[1] == 'D')
+    {
+      cubeConnected = false;
+      fo = false, foa = false;
+      fi = false, fia = false;
+      SetAllLed(0,0,0);
+    }
   }
 }
 

@@ -6,17 +6,30 @@
 
 //presets
 #define LED_PIN     9
-#define NUM_LEDS    6
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
 #define BAUDBT 57600
-#define BAUDSE 9600
+#define BAUDSE 57600
 
 //variables
 float x, y, z;
+//temp color
+uint8_t tr, tg, tb;
+bool cubeConnected = false;
+bool reverse = false;
 
-#define DEBUG true
+//reserved for led animations
+unsigned long timer1;
+unsigned long timer2;
+int counter;
+//runtime vars for effects
+bool fo = false, foa = false;
+bool fi = false, fia = false;
+uint8_t fLed;
+int fTime;
+
+#define DEBUG false
 #define GYRO false
 
 #if DEBUG
@@ -26,7 +39,7 @@ unsigned long previousMillis = 0;
 //persistent objects
 SoftwareSerial BT(5, 6);
 MPU6050 mpu6050(Wire, 0.1, 0.6);
-CRGB leds[NUM_LEDS];
+CRGB leds[6];
 
 void setup() {
 #if DEBUG
@@ -35,8 +48,8 @@ void setup() {
 #endif
 
   //initialize LEDs
-  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
-  SetLedBrightnes(128);
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, 6).setCorrection( TypicalLEDStrip );
+  SetLedBrightnes(64);
   LedOff();
 #if DEBUG
   Serial.println("---LEDs initialized---");
@@ -61,10 +74,35 @@ void setup() {
 }
 
 void loop() {
+  //do fancy pairing animation
+  if(!cubeConnected)
+  {
+    if(millis() > timer1 + 10)
+    {
+      timer1 = millis();
+      if(!reverse)
+      {
+        if(counter >= 254) reverse = true;
+        SetAllLed(0, 0, counter++);
+      }
+      else
+      {
+        if(counter <= 1) reverse = false;
+        SetAllLed(0, 0, counter--);
+      }
+    }
+  }
+  
   //update gyro data
   GyroUpdate();
-
+  //handle command input
   ReceiveData();
+
+  //time dependent effect functions
+  FadeOut();
+  FadeOutAll();
+  FadeIn();
+  FadeInAll();
 
   FastLED.show();
 }
