@@ -1,4 +1,4 @@
-void SetLedBrightnes(uint8_t bright)
+void SetLedBrightness(uint8_t bright)
 {
   FastLED.setBrightness(  bright );
 
