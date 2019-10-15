@@ -95,11 +95,11 @@ void loop() {
       }
     }
   }
-
-  //periodicly send battery voltages
-  if(millis() > timer1 + 10000)
+  //periodicly send battery voltages 
+  else if(millis() > timer1 + 10000)
   {
-    
+    timer1 = millis();
+    BT.println("v" +String(analogRead(A0), DEC));
   }
   
   //update gyro data
