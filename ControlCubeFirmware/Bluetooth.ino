@@ -19,10 +19,10 @@ void ReceiveData()
 
 void ProcessData(char* data)
 {
-#if DEBUG
-  Serial.print("Received: ");
-  Serial.write(data);
-#endif
+  #if DEBUG
+    Serial.print("Received: ");
+    Serial.write(data);
+  #endif
 
 
 
@@ -33,9 +33,9 @@ void ProcessData(char* data)
     //confim that its a valid control cube
     SendData("y");
     cubeConnected = true;
-#if DEBUG
-    Serial.println("---Bluetooth connected---");
-#endif
+    #if DEBUG
+      Serial.println("---Bluetooth connected---");
+    #endif
   }
 
   //set color of a led
@@ -57,40 +57,28 @@ void ProcessData(char* data)
   //fade subcategory
   if (data[0] == 'f')
   {
-    switch (data[1])
+    if(data[1] == 'o')
     {
-      //fade in single led
-      case 'i':
-        //fi0r255g255b255t1000
-        fLed = (int)data[2] - 48;
-        leds[fLed].r = atoi(strpbrk(data, "r") + 1);
-        leds[fLed].g = atoi(strpbrk(data, "g") + 1);
-        leds[fLed].b = atoi(strpbrk(data, "b") + 1);
-        fTime = atoi(strpbrk(data, "t") + 1);
-        fi = true;
-        break;
+      //fade in single
+      //fo0r255g255b255t1000
+      int led = (int)data[2] - 48;
+      fTime[led] = atoi(strpbrk(data, "t") + 1);
+      tLeds[led].r = atoi(strpbrk(data, "r") + 1);
+      tLeds[led].g = atoi(strpbrk(data, "g") + 1);
+      tLeds[led].b = atoi(strpbrk(data, "b") + 1);
+    }
+    else if(data[1] == 'a')
+    {
       //fade in all
-      case 'a':
-        //far255g255b255t1000
-        tr = atoi(strpbrk(data, "r") + 1);
-        tg = atoi(strpbrk(data, "g") + 1);
-        tb = atoi(strpbrk(data, "b") + 1);
-        fTime = atoi(strpbrk(data, "t") + 1);
-        fia = true;
-        break;
-      //fade out single
-      case 'o':
-        //fo0t1000
-        fLed = (int)data[2] - 48;
-        fTime = atoi(strpbrk(data, "t") + 1);
-        fo = true;
-        break;
-      //fade out all
-      case 'p':
-        //fbt1000
-        fTime = atoi(strpbrk(data, "t") + 1);
-        foa = true;
-        break;
+      //far255g255b255t1000
+      for(int i = 0; i < 6; i++)
+      {
+        fTime[i] = atoi(strpbrk(data, "t") + 1);
+        tLeds[i].r = atoi(strpbrk(data, "r") + 1);
+        tLeds[i].g = atoi(strpbrk(data, "g") + 1);
+        tLeds[i].b = atoi(strpbrk(data, "b") + 1);
+      }
+      
     }
   }
 
@@ -107,12 +95,10 @@ void ProcessData(char* data)
   {
     if (data[1] == 'D')
     {
-#if DEBUG
-      Serial.println("---Bluetooth disconnected---");
-#endif
+      #if DEBUG
+        Serial.println("---Bluetooth disconnected---");
+      #endif
       cubeConnected = false;
-      fo = false, foa = false;
-      fi = false, fia = false;
       LedOff();
     }
   }
@@ -122,8 +108,8 @@ void ProcessData(char* data)
 void SendData(String data)
 {
   BT.println(data);
-#if DEBUG
-  Serial.print("Sending to BT: ");
-  Serial.println(data);
-#endif
+  #if DEBUG
+    Serial.print("Sending to BT: ");
+    Serial.println(data);
+  #endif
 }
