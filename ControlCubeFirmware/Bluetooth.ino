@@ -115,8 +115,7 @@ void ProcessData(char* data)
 //send data to computer
 void SendData(String data)
 {
-  BT.print(data);
-  BT.print('\n');
+  BT.println(data);
 #if DEBUG
   Serial.print("Sending to BT: ");
   Serial.println(data);
