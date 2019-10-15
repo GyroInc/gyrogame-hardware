@@ -2,7 +2,7 @@
 #include <FastLED.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include <NeoSWSerial.h>
+#include <AltSoftSerial.h>
 
 //presets
 #define LED_PIN     9
@@ -37,7 +37,7 @@ unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-NeoSWSerial BT(5, 6);
+AltSoftSerial BT;
 MPU6050 mpu6050(Wire, 0.1, 0.6);
 CRGB leds[6];
 CRGB tLeds[6];
