@@ -15,8 +15,8 @@
 
 #define BAUDBT 38400
 #define BAUDSE 38400
-
-#define DEFAULT_BRIGHTNESS 8
+#define DEFAULT_BRIGHTNESS 16
+#define GYRO_GRAVITY_THRESHOLD 0.75
 
 //variables
 float x, y, z;
@@ -29,6 +29,7 @@ bool reverse = false;
 unsigned long eTimer[6];
 int fTime[6];
 unsigned long timer1;
+unsigned long timer2;
 int counter;
 
 #if DEBUG
@@ -73,6 +74,9 @@ void setup() {
 #if DEBUG
   Serial.println("---Bluetooth initialized---");
 #endif
+
+  //battery Measure pin
+  pinMode(A0, INPUT);
 }
 
 void loop() {
@@ -95,6 +99,13 @@ void loop() {
     }
   }
 
+
+  //periodicly send battery voltages
+  if(millis() > timer1 + 10000)
+  {
+    
+  }
+
 #if GYRO
   //update gyro data
   GyroUpdate();
@@ -104,5 +115,10 @@ void loop() {
 
   Fade();
 
-  FastLED.show();
+  if(millis() > timer2 + 16)
+  {
+    timer2 = millis();
+    FastLED.show();
+  }
+  
 }

@@ -47,16 +47,16 @@ void SetGyroOffset(float x, float y, float z)
 
 int FindFaceUp()
 {
-  if (x > 0.5)
+  if (x > GYRO_GRAVITY_THRESHOLD)
     return 3;
-  else if (x < -0.5)
+  else if (x < -GYRO_GRAVITY_THRESHOLD)
     return 5;
-  else if (y > 0.5)
+  else if (y > GYRO_GRAVITY_THRESHOLD)
     return 4;
-  else if (y < -0.5)
+  else if (y < -GYRO_GRAVITY_THRESHOLD)
     return 2;
-  else if (z > 0.5)
+  else if (z > GYRO_GRAVITY_THRESHOLD)
     return 6;
-  else if (z < -0.5)
+  else if (z < -GYRO_GRAVITY_THRESHOLD)
     return 0;
 }
