@@ -3,7 +3,7 @@
 #include <MPU6050_tockn.h>
 #include <Wire.h>
 //#include <NeoSWSerial.h>
-#include <SoftwareSerial.h>
+#include <NeoSWSerial.h>
 
 //presets
 #define LED_PIN     9
@@ -12,6 +12,7 @@
 
 #define DEBUG true
 #define GYRO false
+
 #define BAUDBT 38400
 #define BAUDSE 38400
 #define DEFAULT_BRIGHTNESS 16
@@ -36,7 +37,7 @@ unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-SoftwareSerial BT(5, 6);
+NeoSWSerial BT(5, 6);
 MPU6050 mpu6050(Wire, 0.1, 0.6);
 CRGB leds[6];
 CRGB tLeds[6];
@@ -59,9 +60,11 @@ void setup() {
 #if DEBUG
   Serial.println("Wire begin");
 #endif
+#if GYRO
   Wire.begin();
   mpu6050.begin();
   mpu6050.setGyroOffsets(-1.83, 0.39, -1.13);
+#endif GYRO
 #if DEBUG
   Serial.println("---Gyro initialized---");
 #endif
@@ -95,15 +98,19 @@ void loop() {
       }
     }
   }
-  //periodicly send battery voltages 
-  else if(millis() > timer1 + 10000)
+
+
+  //periodicly send battery voltages
+  if(millis() > timer1 + 10000)
   {
     timer1 = millis();
     BT.println("v" +String(analogRead(A0), DEC));
   }
-  
+
+#if GYRO
   //update gyro data
   GyroUpdate();
+#endif GYRO
   //handle command input
   ReceiveData();
 
