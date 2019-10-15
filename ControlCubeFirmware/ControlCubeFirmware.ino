@@ -104,7 +104,7 @@ void loop() {
   if(millis() > timer1 + 10000)
   {
     timer1 = millis();
-    BT.println("v" +String(analogRead(A0), DEC));
+    SendData("v" +String(analogRead(A0), DEC));
   }
 
 #if GYRO_ENABLED
