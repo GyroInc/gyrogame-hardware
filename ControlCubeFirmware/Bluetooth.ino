@@ -1,17 +1,20 @@
+#define TERM_CHAR '\n'
+#define BUFFER_SIZE 64
+
 void ReceiveData()
 {
-  char inputBuffer[64];
+  char inputBuffer[BUFFER_SIZE];
   //clear data from inputbuffer to not receive the same commands again
   memset(inputBuffer, 0, sizeof(inputBuffer));
-  int i = 0;
-
-  if (BT.available() > 0)
+  
+  int numberOfBytes = 0;
+  
+  if (BT.available())
   {
-    while (BT.available() > 0)
-    {
-      inputBuffer[i++] = BT.read();
-      if (i > 63) return;
-    }
+    numberOfBytes = BT.readBytesUntil(TERM_CHAR, inputBuffer, BUFFER_SIZE);
+  }
+  if (numberOfBytes > 0)
+  {
     //process
     ProcessData(inputBuffer);
   }
@@ -21,7 +24,7 @@ void ProcessData(char* data)
 {
   #if DEBUG
     Serial.print("Received: ");
-    Serial.write(data);
+    Serial.println(data);
   #endif
 
 

@@ -3,7 +3,7 @@ void SetLedBrightness(uint8_t bright)
   FastLED.setBrightness(  bright );
 
 #if DEBUG
-  Serial.print("Set Brightnes to: ");
+  Serial.print("Set Brightness to: ");
   Serial.println(bright);
 #endif
 }

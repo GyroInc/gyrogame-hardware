@@ -6,9 +6,9 @@ void GyroUpdate()
   y = mpu6050.getAccY();
   z = mpu6050.getAccZ();
 
-#if GYRO
+#if DEBUG_GYRO_DATA
   unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= 200) {
+  if (currentMillis - previousMillis >= 100) {
     Serial.print("GyroData: ");
     Serial.print(mpu6050.getAngleX());
     Serial.print("-");

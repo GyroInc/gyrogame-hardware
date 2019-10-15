@@ -2,20 +2,21 @@
 #include <FastLED.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include <SoftwareSerial.h>
+#include <NeoSWSerial.h>
 
 //presets
 #define LED_PIN     9
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define DEBUG true
-#define GYRO false
+#define DEBUG true                  //enable debug data to be sent to hardware serial
+#define DEBUG_GYRO_DATA false       //print debug gyro data
+#define GYRO_ENABLED true           //enable / disable gyro related initialization and loop functions
 
-#define BAUDBT 38400
-#define BAUDSE 38400
-#define DEFAULT_BRIGHTNESS 16
-#define GYRO_GRAVITY_THRESHOLD 0.75
+#define BAUDBT 38400                //baudrate BT module <-> Arduino
+#define BAUDSE 38400                //baudrate debug hardware serial
+#define DEFAULT_BRIGHTNESS 30       //0-255
+#define GYRO_GRAVITY_THRESHOLD 0.75 
 
 //variables
 float x, y, z;
@@ -36,7 +37,7 @@ unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-SoftwareSerial BT(5, 6);
+NeoSWSerial BT(5, 6);
 MPU6050 mpu6050(Wire, 0.1, 0.6);
 CRGB leds[6];
 CRGB tLeds[6];
@@ -59,11 +60,11 @@ void setup() {
 #if DEBUG
   Serial.println("Wire begin");
 #endif
-#if GYRO
+#if GYRO_ENABLED
   Wire.begin();
   mpu6050.begin();
   mpu6050.setGyroOffsets(-1.83, 0.39, -1.13);
-#endif GYRO
+#endif
 #if DEBUG
   Serial.println("---Gyro initialized---");
 #endif
@@ -106,10 +107,10 @@ void loop() {
     BT.println("v" +String(analogRead(A0), DEC));
   }
 
-#if GYRO
+#if GYRO_ENABLED
   //update gyro data
   GyroUpdate();
-#endif GYRO
+#endif
   //handle command input
   ReceiveData();
 
