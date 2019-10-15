@@ -50,6 +50,7 @@ void Fade()
         else if(tLeds[i].b < leds[i].b) leds[i].b -= 1;
         
         SetLedColor(i, leds[i].r, leds[i].g, leds[i].b);
+        eTimer[i] = millis();
 
         if(tLeds[i].r == leds[i].r && tLeds[i].g == leds[i].g && tLeds[i].b == leds[i].b) fTime[i] = 0;
       }
