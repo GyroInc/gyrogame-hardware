@@ -2,10 +2,10 @@
 #include <FastLED.h>
 #include <MPU6050_tockn.h>
 #include <Wire.h>
-#include <AltSoftSerial.h>
+#include <SoftwareSerial.h>
 
 //presets
-#define LED_PIN     5
+#define LED_PIN     9
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
@@ -17,6 +17,7 @@
 #define BAUDSE 38400                //baudrate debug hardware serial
 #define DEFAULT_BRIGHTNESS 30       //0-255
 #define GYRO_GRAVITY_THRESHOLD 0.75 
+#define GYRO_SEND_DELAY 80
 
 //variables
 float x, y, z;
@@ -30,6 +31,7 @@ unsigned long eTimer[6];
 int fTime[6];
 unsigned long timer1;
 unsigned long timer2;
+unsigned long gyroTimer;
 int counter;
 
 #if DEBUG
@@ -37,8 +39,8 @@ unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-AltSoftSerial BT;
-MPU6050 mpu6050(Wire, 0.1, 0.6);
+SoftwareSerial BT(5,6);
+MPU6050 mpu6050(Wire, 0.1, 0.9);
 CRGB leds[6];
 CRGB tLeds[6];
 
@@ -89,16 +91,15 @@ void loop() {
       if(!reverse)
       {
         if(counter >= 254) reverse = true;
-        SetAllLed(0, 0, counter++);
+        SetAllLed(counter++, 0, 0);
       }
       else
       {
         if(counter <= 1) reverse = false;
-        SetAllLed(0, 0, counter--);
+        SetAllLed(counter--, 0, 0);
       }
     }
   }
-
 
   //periodicly send battery voltages
   if(millis() > timer1 + 10000)
@@ -113,7 +114,7 @@ void loop() {
 #endif
   //handle command input
   ReceiveData();
-
+  SendGyroData();
   Fade();
 
   if(millis() > timer2 + 33)

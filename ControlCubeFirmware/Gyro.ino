@@ -11,13 +11,29 @@ void GyroUpdate()
   if (currentMillis - previousMillis >= 100) {
     Serial.print("GyroData: ");
     Serial.print(mpu6050.getAngleX());
-    Serial.print("-");
+    Serial.print("_");
     Serial.print(mpu6050.getAngleY());
-    Serial.print("-");
+    Serial.print("_");
     Serial.println(mpu6050.getAngleZ());
     previousMillis = currentMillis;
   }
 #endif
+}
+
+void SendGyroData()
+{
+  if(!cubeConnected) return;
+  if(millis() > gyroTimer + GYRO_SEND_DELAY)
+  {
+    gyroTimer = millis();
+    BT.print('g');
+    BT.print(mpu6050.getAngleX());
+    BT.print('_');
+    BT.print(mpu6050.getAngleY());
+    BT.print('_');
+    BT.println(mpu6050.getAngleZ());
+    //BT.println(FindFaceUp());
+  }
 }
 
 void CalibrateGyro()
@@ -48,15 +64,15 @@ void SetGyroOffset(float x, float y, float z)
 int FindFaceUp()
 {
   if (x > GYRO_GRAVITY_THRESHOLD)
-    return 3;
-  else if (x < -GYRO_GRAVITY_THRESHOLD)
-    return 5;
-  else if (y > GYRO_GRAVITY_THRESHOLD)
-    return 4;
-  else if (y < -GYRO_GRAVITY_THRESHOLD)
     return 2;
+  else if (x < -GYRO_GRAVITY_THRESHOLD)
+    return 4;
+  else if (y > GYRO_GRAVITY_THRESHOLD)
+    return 3;
+  else if (y < -GYRO_GRAVITY_THRESHOLD)
+    return 1;
   else if (z > GYRO_GRAVITY_THRESHOLD)
-    return 6;
+    return 5;
   else if (z < -GYRO_GRAVITY_THRESHOLD)
     return 0;
 }
