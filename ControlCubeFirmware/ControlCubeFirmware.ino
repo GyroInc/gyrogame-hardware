@@ -5,7 +5,7 @@
 #include <NeoSWSerial.h>
 
 //presets
-#define LED_PIN     5
+#define LED_PIN     9
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
