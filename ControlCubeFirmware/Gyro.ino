@@ -39,12 +39,11 @@ void SendGyroData()
 void CalibrateGyro()
 {
 #if DEBUG
-  Serial.println("Calculating gyro offsets");
   mpu6050.calcGyroOffsets(true);
-  return;
-#endif
-
+  Serial.println();
+#else
   mpu6050.calcGyroOffsets(false);
+#endif
 }
 
 void SetGyroOffset(float x, float y, float z)

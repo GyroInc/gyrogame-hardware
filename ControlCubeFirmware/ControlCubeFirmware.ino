@@ -16,7 +16,8 @@
 #define BAUDBT 38400                //baudrate BT module <-> Arduino
 #define BAUDSE 38400                //baudrate debug hardware serial
 #define DEFAULT_BRIGHTNESS 30       //0-255
-#define GYRO_GRAVITY_THRESHOLD 0.75 
+#define GYRO_CALIBRATE false
+#define GYRO_GRAVITY_THRESHOLD 0.75
 #define GYRO_SEND_DELAY 80
 
 //variables
@@ -39,7 +40,7 @@ unsigned long previousMillis = 0;
 #endif
 
 //persistent objects
-SoftwareSerial BT(5,6);
+SoftwareSerial BT(5, 6);
 MPU6050 mpu6050(Wire, 0.1, 0.9);
 CRGB leds[6];
 CRGB tLeds[6];
@@ -59,13 +60,17 @@ void setup() {
 #endif
 
   //initialize mpu
+#if GYRO_ENABLED
 #if DEBUG
   Serial.println("Wire begin");
 #endif
-#if GYRO_ENABLED
   Wire.begin();
   mpu6050.begin();
+#if GYRO_CALIBRATE
+  CalibrateGyro();
+#else
   mpu6050.setGyroOffsets(-1.83, 0.39, -1.13);
+#endif
 #endif
 #if DEBUG
   Serial.println("---Gyro initialized---");
@@ -83,29 +88,29 @@ void setup() {
 
 void loop() {
   //do fancy pairing animation
-  if(!cubeConnected)
+  if (!cubeConnected)
   {
-    if(millis() > timer1 + 10)
+    if (millis() > timer1 + 10)
     {
       timer1 = millis();
-      if(!reverse)
+      if (!reverse)
       {
-        if(counter >= 254) reverse = true;
+        if (counter >= 254) reverse = true;
         SetAllLed(counter++, 0, 0);
       }
       else
       {
-        if(counter <= 1) reverse = false;
+        if (counter <= 1) reverse = false;
         SetAllLed(counter--, 0, 0);
       }
     }
   }
 
   //periodicly send battery voltages
-  if(millis() > timer1 + 10000)
+  if (millis() > timer1 + 10000)
   {
     timer1 = millis();
-    SendData("v" +String(analogRead(A0), DEC));
+    SendData("v" + String(analogRead(A0), DEC));
   }
 
 #if GYRO_ENABLED
@@ -117,7 +122,7 @@ void loop() {
   SendGyroData();
   Fade();
 
-  if(millis() > timer2 + 33)
+  if (millis() > timer2 + 33)
   {
     timer2 = millis();
     FastLED.show();
