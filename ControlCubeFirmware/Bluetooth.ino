@@ -27,8 +27,6 @@ void ProcessData(char* data)
   Serial.println(data);
 #endif
 
-
-
   //confirm that its the controller for the game
   //cc stands for confirm cube
   if (data[0] == 'c' && data[1] == 'c')
@@ -39,6 +37,12 @@ void ProcessData(char* data)
 #if DEBUG
     Serial.println("---Bluetooth connected---");
 #endif
+  }
+
+  //recalibrate gyro
+  if (data[0] == 'c')
+  {
+    GyroCalibrate();
   }
 
   //set color of a led

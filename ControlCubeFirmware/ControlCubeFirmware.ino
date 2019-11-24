@@ -1,17 +1,22 @@
 //used libraries
 #include <FastLED.h>
-#include <MPU6050_tockn.h>
-#include <Wire.h>
+//#include <MPU6050_tockn.h>
+//#include <Wire.h>
 #include <SoftwareSerial.h>
+
+#include "I2Cdev.h"
+#include "MPU6050_6Axis_MotionApps20.h"
+#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
+#include "Wire.h"
+#endif
+
 
 //presets
 #define LED_PIN     9
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
 
-#define DEBUG true                  //enable debug data to be sent to hardware serial
-#define DEBUG_GYRO_DATA false       //print debug gyro data
-#define GYRO_ENABLED true           //enable / disable gyro related initialization and loop functions
+#define INTERRUPT_PIN 2             // Gyro interrupt pin
 
 #define BAUDBT 38400                //baudrate BT module <-> Arduino
 #define BAUDSE 38400                //baudrate debug hardware serial
@@ -19,6 +24,10 @@
 #define GYRO_CALIBRATE false
 #define GYRO_GRAVITY_THRESHOLD 0.75
 #define GYRO_SEND_DELAY 80
+
+#define DEBUG true                  //enable debug data to be sent to hardware serial
+#define DEBUG_GYRO_DATA false       //print debug gyro data
+#define GYRO_ENABLED true           //enable / disable gyro related initialization and loop functions
 
 //variables
 float x, y, z;
@@ -33,19 +42,17 @@ int fTime[6];
 unsigned long timer1;
 unsigned long timer2;
 unsigned long gyroTimer;
-int counter;
+int pairingCounter;
 
-#if DEBUG
-unsigned long previousMillis = 0;
-#endif
 
 //persistent objects
 SoftwareSerial BT(5, 6);
-MPU6050 mpu6050(Wire, 0.1, 0.9);
+//MPU6050 mpu6050(Wire, 0.1, 0.9);
 CRGB leds[6];
 CRGB tLeds[6];
 
-void setup() {
+void setup()
+{
 #if DEBUG
   Serial.begin(BAUDSE);
   Serial.println("Starting in debug mode");
@@ -62,18 +69,14 @@ void setup() {
   //initialize mpu
 #if GYRO_ENABLED
 #if DEBUG
-  Serial.println("Wire begin");
+  Serial.println("---Initializing Gyro...---");
 #endif
-  Wire.begin();
-  mpu6050.begin();
-#if GYRO_CALIBRATE
-  CalibrateGyro();
-#else
-  mpu6050.setGyroOffsets(-1.83, 0.39, -1.13);
-#endif
-#endif
+  //  Wire.begin();
+  //  mpu6050.begin();
+  GyroInit();
 #if DEBUG
   Serial.println("---Gyro initialized---");
+#endif
 #endif
 
   //initialize bluetooth
@@ -87,6 +90,7 @@ void setup() {
 }
 
 void loop() {
+
   //do fancy pairing animation
   if (!cubeConnected)
   {
@@ -95,13 +99,13 @@ void loop() {
       timer1 = millis();
       if (!reverse)
       {
-        if (counter >= 254) reverse = true;
-        SetAllLed(counter++, 0, 0);
+        if (pairingCounter >= 254) reverse = true;
+        SetAllLed(pairingCounter++, 0, 0);
       }
       else
       {
-        if (counter <= 1) reverse = false;
-        SetAllLed(counter--, 0, 0);
+        if (pairingCounter <= 1) reverse = false;
+        SetAllLed(pairingCounter--, 0, 0);
       }
     }
   }
@@ -113,19 +117,29 @@ void loop() {
     SendData("v" + String(analogRead(A0), DEC));
   }
 
-#if GYRO_ENABLED
-  //update gyro data
-  GyroUpdate();
-#endif
   //handle command input
   ReceiveData();
-  SendGyroData();
+
+  //update gyro data
+#if GYRO_ENABLED
+  GyroUpdate();
+  if (cubeConnected)
+  {
+    if (millis() > gyroTimer + GYRO_SEND_DELAY)
+    {
+      gyroTimer = millis();
+      GyroSendData();
+    }
+  }
+#endif
+
+  //LED fading routine
   Fade();
 
+  //refresh LEDs every 33 seconds
   if (millis() > timer2 + 33)
   {
     timer2 = millis();
     FastLED.show();
   }
-
 }
