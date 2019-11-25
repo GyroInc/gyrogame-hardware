@@ -23,7 +23,7 @@
 #define DEFAULT_BRIGHTNESS 30       //0-255
 #define GYRO_CALIBRATE false
 #define GYRO_GRAVITY_THRESHOLD 0.75
-#define GYRO_SEND_DELAY 80
+#define GYRO_SEND_DELAY 20
 
 #define DEBUG true                  //enable debug data to be sent to hardware serial
 #define DEBUG_GYRO_DATA false       //print debug gyro data

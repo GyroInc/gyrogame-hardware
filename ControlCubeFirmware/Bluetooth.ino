@@ -121,7 +121,7 @@ void SendData(String data)
 {
   BT.println(data);
 #if DEBUG
-  Serial.print("Sending to BT: ");
+  Serial.print("Sending :");
   Serial.println(data);
 #endif
 }
