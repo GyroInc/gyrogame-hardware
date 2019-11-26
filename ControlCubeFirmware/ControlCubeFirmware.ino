@@ -21,9 +21,10 @@
 #define BAUDBT 38400                //baudrate BT module <-> Arduino
 #define BAUDSE 38400                //baudrate debug hardware serial
 #define DEFAULT_BRIGHTNESS 30       //0-255
-#define GYRO_CALIBRATE false
-#define GYRO_GRAVITY_THRESHOLD 0.75
+//#define GYRO_CALIBRATE false
+//#define GYRO_GRAVITY_THRESHOLD 0.75
 #define GYRO_SEND_DELAY 20
+#define VOLTAGE_SEND_DELAY 3000
 
 #define DEBUG true                  //enable debug data to be sent to hardware serial
 #define DEBUG_GYRO_DATA false       //print debug gyro data
@@ -111,7 +112,7 @@ void loop() {
   }
 
   //periodicly send battery voltages
-  if (millis() > timer1 + 10000)
+  if (millis() > timer1 + VOLTAGE_SEND_DELAY)
   {
     timer1 = millis();
     SendData("v" + String(analogRead(A0), DEC));
