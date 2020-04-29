@@ -9,9 +9,9 @@ void ReceiveData()
 
   int numberOfBytes = 0;
 
-  if (BT.available())
+  if (Serial.available())
   {
-    numberOfBytes = BT.readBytesUntil(TERM_CHAR, inputBuffer, BUFFER_SIZE);
+    numberOfBytes = Serial.readBytesUntil(TERM_CHAR, inputBuffer, BUFFER_SIZE);
   }
   if (numberOfBytes > 0)
   {
@@ -22,11 +22,6 @@ void ReceiveData()
 
 void ProcessData(char* data)
 {
-#if DEBUG
-  Serial.print("Received: ");
-  Serial.println(data);
-#endif
-
   //confirm that its the controller for the game
   //cc stands for confirm cube
   if (data[0] == 'c' && data[1] == 'c')
@@ -34,9 +29,6 @@ void ProcessData(char* data)
     //confim that its a valid control cube
     SendData("y");
     cubeConnected = true;
-#if DEBUG
-    Serial.println("---Bluetooth connected---");
-#endif
   }
 
   //recalibrate gyro
@@ -107,9 +99,6 @@ void ProcessData(char* data)
   {
     if (data[1] == 'D')
     {
-#if DEBUG
-      Serial.println("---Bluetooth disconnected---");
-#endif
       cubeConnected = false;
       LedOff();
     }
@@ -119,9 +108,5 @@ void ProcessData(char* data)
 //send data to computer
 void SendData(String data)
 {
-  BT.println(data);
-#if DEBUG
-  Serial.print("Sending :");
   Serial.println(data);
-#endif
 }

@@ -1,11 +1,6 @@
 void SetLedBrightness(uint8_t bright)
 {
   FastLED.setBrightness(  bright );
-
-#if DEBUG
-  Serial.print("Set Brightness to: ");
-  Serial.println(bright);
-#endif
 }
 
 void LedOff()
@@ -14,10 +9,6 @@ void LedOff()
     leds[i] = CRGB::Black;
   }
   FastLED.show();
-
-#if DEBUG
-  Serial.println("Leds off");
-#endif
 }
 
 void SetLedColor(uint8_t led, uint8_t r, uint8_t g, uint8_t b)

@@ -48,10 +48,6 @@ void GyroInit()
 
 void GyroCalibrate()
 {
-#if DEBUG
-  Serial.println("---Calibrating Gyro---");
-#endif
-  Serial.println(F("Initializing DMP..."));
   devStatus = mpu.dmpInitialize();
 
   // supply your own gyro offsets here, scaled for min sensitivity
@@ -65,20 +61,16 @@ void GyroCalibrate()
     // Calibration Time: generate offsets and calibrate our MPU6050
     //mpu.CalibrateAccel(6);
     //mpu.CalibrateGyro(6);
-    mpu.PrintActiveOffsets();
+    //mpu.PrintActiveOffsets();
     // turn on the DMP, now that it's ready
-    Serial.println(F("Enabling DMP..."));
     mpu.setDMPEnabled(true);
 
     // enable Arduino interrupt detection
-    Serial.print(F("Enabling interrupt detection (Arduino external interrupt "));
-    Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
-    Serial.println(F(")..."));
+    digitalPinToInterrupt(INTERRUPT_PIN);
     attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
     mpuIntStatus = mpu.getIntStatus();
 
     // set our DMP Ready flag so the main loop() function knows it's okay to use it
-    Serial.println(F("DMP ready! Waiting for first interrupt..."));
     dmpReady = true;
 
     // get expected DMP packet size for later comparison
@@ -88,9 +80,6 @@ void GyroCalibrate()
     // 1 = initial memory load failed
     // 2 = DMP configuration updates failed
     // (if it's going to break, usually the code will be 1)
-    Serial.print(F("DMP Initialization failed (code "));
-    Serial.print(devStatus);
-    Serial.println(F(")"));
   }
 }
 
@@ -122,7 +111,6 @@ void GyroUpdate()
     // reset so we can continue cleanly
     mpu.resetFIFO();
     //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
-    Serial.println(F("FIFO overflow!"));
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
   } else if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT)) {
@@ -149,9 +137,6 @@ void GyroSendData()
   // display quaternion values in easy matrix form: w x y z
   mpu.dmpGetQuaternion(&quat, fifoBuffer);
   SendData("q" + String(quat.w) + "_" + String(quat.x) + "_" + String(quat.y) + "_" + String(quat.z));
-#if DEBUG_GYRO_DATA
-  Serial.println("q" + String(quat.w) + "_" + String(quat.x) + "_" + String(quat.y) + "_" + String(quat.z));
-#endif
 }
 
 
@@ -184,19 +169,6 @@ void GyroUpdate()
   x = mpu6050.getAccX();
   y = mpu6050.getAccY();
   z = mpu6050.getAccZ();
-
-#if DEBUG_GYRO_DATA
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= 100) {
-    Serial.print("GyroData: ");
-    Serial.print(mpu6050.getAngleX());
-    Serial.print("_");
-    Serial.print(mpu6050.getAngleY());
-    Serial.print("_");
-    Serial.println(mpu6050.getAngleZ());
-    previousMillis = currentMillis;
-  }
-#endif
 }
 
 void SendGyroData()
@@ -204,38 +176,24 @@ void SendGyroData()
   if (millis() > gyroTimer + GYRO_SEND_DELAY)
   {
     gyroTimer = millis();
-    BT.print('g');
-    BT.print(mpu6050.getAngleX());
-    BT.print('_');
-    BT.print(mpu6050.getAngleY());
-    BT.print('_');
-    BT.println(mpu6050.getAngleZ());
-    //BT.println(FindFaceUp());
+    Serial.print('g');
+    Serial.print(mpu6050.getAngleX());
+    Serial.print('_');
+    Serial.print(mpu6050.getAngleY());
+    Serial.print('_');
+    Serial.println(mpu6050.getAngleZ());
+    //Serial.println(FindFaceUp());
   }
 }
 
 
 void CalibrateGyro()
 {
-#if DEBUG
-  mpu6050.calcGyroOffsets(true);
-  Serial.println();
-#else
   mpu6050.calcGyroOffsets(false);
-#endif
 }
 
 void SetGyroOffset(float x, float y, float z)
 {
-#if DEBUG
-  Serial.println("Setting Gyro offsets to:");
-  Serial.print("x: ");
-  Serial.println(x);
-  Serial.print(" y: ");
-  Serial.println(y);
-  Serial.print(" z: ");
-  Serial.println(z);
-#endif
   mpu6050.setGyroOffsets(x, y, z);
 }
 

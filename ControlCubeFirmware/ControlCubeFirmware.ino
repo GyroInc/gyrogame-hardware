@@ -47,44 +47,25 @@ int pairingCounter;
 
 
 //persistent objects
-SoftwareSerial BT(5, 6);
+//SoftwareSerial BT(5, 6);
 //MPU6050 mpu6050(Wire, 0.1, 0.9);
 CRGB leds[6];
 CRGB tLeds[6];
 
 void setup()
 {
-#if DEBUG
-  Serial.begin(BAUDSE);
-  Serial.println("Starting in debug mode");
-#endif
-
   //initialize LEDs
   FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, 6).setCorrection( TypicalLEDStrip );
   SetLedBrightness(DEFAULT_BRIGHTNESS);
   LedOff();
-#if DEBUG
-  Serial.println("---LEDs initialized---");
-#endif
-
+  
   //initialize mpu
 #if GYRO_ENABLED
-#if DEBUG
-  Serial.println("---Initializing Gyro...---");
-#endif
-  //  Wire.begin();
-  //  mpu6050.begin();
   GyroInit();
-#if DEBUG
-  Serial.println("---Gyro initialized---");
-#endif
 #endif
 
   //initialize bluetooth
-  BT.begin(BAUDBT);
-#if DEBUG
-  Serial.println("---Bluetooth initialized---");
-#endif
+  Serial.begin(BAUDBT);
 
   //battery Measure pin
   pinMode(A0, INPUT);
