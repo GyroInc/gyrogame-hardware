@@ -1,3 +1,6 @@
+
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/18a0e72f35be432d8be33d0f7e030f1e)](https://app.codacy.com/gh/GyroInc/gyrogame-hardware?utm_source=github.com&utm_medium=referral&utm_content=GyroInc/gyrogame-hardware&utm_campaign=Badge_Grade_Dashboard)
+
 ![](https://raw.githubusercontent.com/Manut38/gyrogame-unity/master/Documentation/Logo/GyroGame_textlogo.png)
 
 <br>
